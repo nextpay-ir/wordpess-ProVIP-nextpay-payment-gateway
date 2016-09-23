@@ -2,13 +2,13 @@
 
 /**
  * Plugin Name: NextPay Gateway For Pro-VIP
- * Created by: NextPay.ir
- * Author: FreezeMan
- * ID: @FreezeMan
- * Date: 7/29/16
+ * Created by NextPay.ir
+ * author: Nextpay Company
+ * ID: @nextpay
+ * Date: 09/22/2016
  * Time: 5:05 PM
  * Website: NextPay.ir
- * Email: freezeman.0098@gmail.com
+ * Email: info@nextpay.ir
  * @copyright 2016
  * @package NextPay_Gateway
  * @version 1.0
@@ -65,7 +65,7 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                     $Amount = intval($payment->price); // Required
                     $orderId = $payment->paymentId; // Required
                     $Description = 'پرداخت فاکتور به شماره ی'.$orderId; // Required
-                    $CallbackURL = add_query_arg('order', $orderId, $this->getReturnUrl()); // $this->getReturnUrl();
+                    $CallbackURL = $this->getReturnUrl(); // add_query_arg('order', $orderId, $this->getReturnUrl());
                     //$currency = $order->get_order_currency();
 
                     if (pvGetOption('currency') === 'IRR') {
@@ -76,6 +76,7 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
 
                     $nextpay = Nextpay_Payment(array(
                         "api_key"=>$Api_key,
+                        "order_id"=>$orderId,
                         "amount"=>$Amount,
                         "callback_uri"=>$CallbackURL));
 
@@ -109,6 +110,7 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                         $Api_key = $this->settings['api_key']; //Required
                         $Amount = intval($payment->price); //  - ریال به مبلغ Required
                         $trans_id = isset($_POST['trans_id'])?$_POST['trans_id'] : false ;
+                        $order_id = isset($_POST['order_id'])?$_POST['order_id'] : false ;
 
                         if (pvGetOption('currency') === 'IRR') {
                             $amount /= 10;
@@ -122,6 +124,7 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                             (
                                 'api_key'	=> $Api_key,
                                 'trans_id' 	=> $trans_id,
+                                'order_id' 	=> $order_id,
                                 'amount'	=> $Amount,
                             );
 
