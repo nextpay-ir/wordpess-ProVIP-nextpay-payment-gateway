@@ -87,9 +87,6 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                         $payment->user = get_current_user_id();
                         $payment->save();
 
-                        //$payment_url = 'https://www.zarinpal.com/pg/StartPay/';
-
-                        //header("Location: $payment_url".$res->Authority);
                         $nextpay->send($res->trans_id);
                     } else {
                         pvAddNotice('خطا در هنگام اتصال به نکست پی.');
