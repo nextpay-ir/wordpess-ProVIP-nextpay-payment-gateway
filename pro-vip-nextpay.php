@@ -59,6 +59,9 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                     parent::__construct();
                 }
 
+                /**
+                 * @param Pro_VIP_Payment $payment
+                 */
                 public function beforePayment(Pro_VIP_Payment $payment)
                 {
                     $Api_key = $this->settings['api_key']; //Required
@@ -72,9 +75,9 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                         $Amount /= 10;
                     }
 
-                    include_once "nextpay_payment.php";
+                    include_once 'nextpay_payment.php';
 
-                    $nextpay = Nextpay_Payment(array(
+                    $nextpay = new Nextpay_Payment(array(
                         "api_key"=>$Api_key,
                         "order_id"=>$orderId,
                         "amount"=>$Amount,
@@ -96,8 +99,8 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
 
                 public function afterPayment()
                 {
-                    if (isset($_GET['order'])) {
-                        $orderId = $_GET['order'];
+                    if (isset($_POST['order_id'])) {
+                        $orderId = $_POST['order_id'];
                     } else {
                         $orderId = 0;
                     }
@@ -105,7 +108,7 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                     if ($orderId) {
                         $payment = new Pro_VIP_Payment($orderId);
                         $Api_key = $this->settings['api_key']; //Required
-                        $Amount = intval($payment->price); //  - ریال به مبلغ Required
+                        $amount = intval($payment->price); //  - ریال به مبلغ Required
                         $trans_id = isset($_POST['trans_id'])?$_POST['trans_id'] : false ;
                         $order_id = isset($_POST['order_id'])?$_POST['order_id'] : false ;
 
@@ -122,20 +125,20 @@ if (!function_exists('init_Nextpay_gateway_pv_class')) {
                                 'api_key'	=> $Api_key,
                                 'trans_id' 	=> $trans_id,
                                 'order_id' 	=> $order_id,
-                                'amount'	=> $Amount,
+                                'amount'	=> $amount,
                             );
 
-                            $nextpay = Nextpay_Payment();
+                            $nextpay = new Nextpay_Payment();
                             $Result = intval($nextpay->verify_request($parameters));
 
                             if ($Result == 0) {
-                                pvAddNotice('پرداخت شما با موفقیت انجام شد. کد پیگیری: '.$orderId, 'success');
+                                pvAddNotice('پرداخت شما با موفقیت انجام شد. کد پیگیری: '.$trans_id, 'success');
                                 $payment->status = 'publish';
                                 $payment->save();
 
                                 $this->paymentComplete($payment);
                             } else {
-                                pvAddNotice('خطایی به هنگام پرداخت پیش آمده. کد خطا عبارت است از :'.$Result.' . برای آگاهی از دلیل خطا کد آن را به نکست پی ارائه نمایید.');
+                                pvAddNotice('به نظر می رسد عملیات پرداخت توسط شما لغو گردیده، اگر چنین نیست مجددا اقدام به پرداخت فاکتور نمایید.');
                                 $this->paymentFailed($payment);
 
                                 return false;
